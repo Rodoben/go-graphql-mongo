@@ -21,7 +21,7 @@ func Connect() sqlx.DB {
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	} else {
-		log.Println("Successfully Connected123")
+		log.Println("Successfully Connected")
 	}
 	return *db
 }

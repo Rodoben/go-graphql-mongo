@@ -90,8 +90,6 @@ func (d *DB) CreateJob(ctx context.Context, input model.CreateJobListingInput) (
 func (d *DB) UpdateJob(ctx context.Context, filter, update primitive.M, id string) (*model.JobListing, error) {
 
 	jobCollection := d.Mongoclient.Database("Jobs-record").Collection("jobs")
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
 
 	_, err := jobCollection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
@@ -137,20 +135,15 @@ func (d *DB) DeleteJob(ctx context.Context, id string) (*model.DeleteJobResponse
 }
 
 func (d *DB) Job(ctx context.Context, id string) (*model.JobListing, error) {
-	fmt.Println("1111")
+
 	jobCollection := d.Mongoclient.Database("Jobs-record").Collection("jobs")
-	// ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	// defer cancel()
-	fmt.Println("11122221")
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	fmt.Println("11333311")
 	var jobListing *model.JobListing
 	err := jobCollection.FindOne(ctx, filter).Decode(&jobListing)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("11144441")
 	return jobListing, nil
 }
 
@@ -164,7 +157,6 @@ func (d *DB) Jobs(ctx context.Context) ([]*model.JobListing, error) {
 		log.Println("Error", err)
 		return nil, err
 	}
-	fmt.Println("Resuklts", results)
 
 	if results.All(ctx, &joblistings); err != nil {
 

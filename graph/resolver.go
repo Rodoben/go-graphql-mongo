@@ -44,7 +44,6 @@ func (r *Resolver) CreateJob(ctx context.Context, input model.CreateJobListingIn
 func (r *Resolver) UpdateJob(ctx context.Context, id string, input *model.UpdateJobListingInput) (*model.JobListing, error) {
 	r.Db = *db
 	updateJobInfo := bson.M{}
-	fmt.Println("1234325234534")
 	if input.JobTitle != "" {
 		updateJobInfo["title"] = input.JobTitle
 	}
@@ -54,16 +53,13 @@ func (r *Resolver) UpdateJob(ctx context.Context, id string, input *model.Update
 	if input.JobDescription != "" {
 		updateJobInfo["jobdescription"] = input.JobDescription
 	}
-	fmt.Println("222222222")
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
 	update := bson.M{"$set": updateJobInfo}
-	fmt.Println("333333333333")
 	resp, err := r.Db.UpdateJob(ctx, filter, update, id)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("333333333333", resp)
 	return resp, nil
 
 }
@@ -92,7 +88,7 @@ func (r *Resolver) Jobs(ctx context.Context) ([]*model.JobListing, error) {
 	r.Db = *db
 	resp, err := r.Db.Jobs(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to fetch Job")
+		return nil, fmt.Errorf("Unable to fetch Jobs")
 	}
 	return resp, nil
 }
