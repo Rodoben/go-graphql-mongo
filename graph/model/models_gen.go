@@ -24,7 +24,7 @@ type HumanResourceInput struct {
 }
 
 type JobListing struct {
-	ID             string `json:"id"`
+	ID             string `json:"_id"`
 	JobTitle       string `json:"jobTitle"`
 	JobDescription string `json:"jobDescription"`
 	JobCompany     string `json:"jobCompany"`

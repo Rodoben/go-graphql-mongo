@@ -25,7 +25,6 @@ type HumanResource {
   hrName: String!
 }
 
-
 input SpocsInput {
   manager: ManagerInput!
   humanResource: HumanResourceInput!
@@ -54,11 +53,11 @@ input UpdateJobListingInput {
   jobSpocs: SpocsInput!
 }
 
-
 type Query {
   jobs: [JobListing!]!
   job(id: ID!): JobListing!
 }
+
 type DeleteJobResponse {
   deleteJobId: String!
 }

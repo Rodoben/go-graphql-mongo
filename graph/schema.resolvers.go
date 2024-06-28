@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rodoben007/go-graphql-mongoDB/graph/model"
 )
@@ -21,22 +20,22 @@ func (r *mutationResolver) CreateJob(ctx context.Context, input model.CreateJobL
 
 // UpdateJob is the resolver for the updateJob field.
 func (r *mutationResolver) UpdateJob(ctx context.Context, id string, input *model.UpdateJobListingInput) (*model.JobListing, error) {
-	panic(fmt.Errorf("not implemented: UpdateJob - updateJob"))
+	return r.Resolver.UpdateJob(ctx, id, input)
 }
 
 // DeleteJob is the resolver for the deleteJob field.
 func (r *mutationResolver) DeleteJob(ctx context.Context, id string) (*model.DeleteJobResponse, error) {
-	panic(fmt.Errorf("not implemented: DeleteJob - deleteJob"))
+	return r.Resolver.DeleteJob(ctx, id)
 }
 
 // Jobs is the resolver for the jobs field.
 func (r *queryResolver) Jobs(ctx context.Context) ([]*model.JobListing, error) {
-	panic(fmt.Errorf("not implemented: Jobs - jobs"))
+	return r.Resolver.Jobs(ctx)
 }
 
 // Job is the resolver for the job field.
 func (r *queryResolver) Job(ctx context.Context, id string) (*model.JobListing, error) {
-	panic(fmt.Errorf("not implemented: Job - job"))
+	return r.Resolver.Job(ctx, id)
 }
 
 // Mutation returns MutationResolver implementation.

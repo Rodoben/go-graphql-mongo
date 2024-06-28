@@ -17,6 +17,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	//db := repository.Connect()
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
