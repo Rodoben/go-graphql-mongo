@@ -19,17 +19,39 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/    
 
+  # postgres:
+  #   image: postgres:14-alpine
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - local_pgdata:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_PASSWORD=S3cret
+  #     - POSTGRES_USER=citizix_user
+  #     - POSTGRES_DB=citizix_db 
   postgres:
-    image: postgres:14-alpine
+    build:
+      context: ./devops/local/postgres
     ports:
       - 5432:5432
-    volumes:
-      - local_pgdata:/var/lib/postgresql/data
+    env_file: .env
     environment:
-      - POSTGRES_PASSWORD=S3cret
-      - POSTGRES_USER=citizix_user
-      - POSTGRES_DB=citizix_db 
+      POSTGRES_DB: defaultdb
+      POSTGRES_USER: $DB_MASTER_USER
+      POSTGRES_PASSWORD: $DB_MASTER_PASS
+    volumes:
+      - ./sql:/mnt/artifacts
+      - ./devops/local/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh 
 
+  liquibase:
+    build:
+      context: ./devops/local/liquibase
+    env_file: .env
+    depends_on:
+      - postgres
+    volumes:
+      - ./sql:/mnt/artifacts
+      - ./devops/local/liquibase/init-scripts/:/dbtool/scripts/ 
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
@@ -41,6 +63,12 @@ services:
       PGADMIN_DEFAULT_PASSWORD: strong-password
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+  # liquibase:
+  #   image: liquibase/liquibase:4.3.2
+  #   depends_on:
+  #     - postgres
+    
+  #   command: ["--defaultsFile=liquibase.properties", "update"]   
 
 volumes:
   local_pgdata:

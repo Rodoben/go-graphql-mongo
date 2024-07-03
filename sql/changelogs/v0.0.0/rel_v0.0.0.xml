@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <include file="./database_setup/0001_schema.sql" relativeToChangelogFile="true"/>
+    <include file="./database_setup/0002_users.sql" relativeToChangelogFile="true"/>
+    <include file="./database_setup/0003_extensions.sql" relativeToChangelogFile="true"/>
+
+    
+    <include file="./tables/1001_sales_order.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1002_sales_order_product.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1003_sales_order_status.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1004_sales_order_company.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1005_sales_order_shipping_address.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1006_sales_order_note.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1007_sales_order_index_ref.sql" relativeToChangelogFile="true"/>
+    <include file="./tables/1008_sales_order_functions.sql" relativeToChangelogFile="true"/>
+    <include file="./permissions/0001_user_privileges.sql" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>
+

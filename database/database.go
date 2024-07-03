@@ -2,12 +2,16 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/rodoben007/go-graphql-mongoDB/database/repository"
+	"github.com/joho/godotenv"
+	"github.com/rodoben007/go-graphql-mongoDB/common"
+	"github.com/rodoben007/go-graphql-mongoDB/repository"
+
 	"github.com/rodoben007/go-graphql-mongoDB/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,17 +22,35 @@ import (
 
 type DB struct {
 	Mongoclient    *mongo.Client
-	PostgresClient *sqlx.DB
+	PostgresClient repository.Rdms
 }
 
 var db = repository.Connect()
 
+func loadMongoProperties() (string, error) {
+	var dbproperties common.DBProperties
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	dbPropertiesBytes := []byte(os.Getenv(common.APP_DB_MONGO_PROPERTIES))
+	err = json.Unmarshal(dbPropertiesBytes, &dbproperties)
+	if err != nil {
+
+		return "", err
+	}
+	dsnstr := fmt.Sprintf("%s://%s:%s@%s:%v", dbproperties.Dbname, dbproperties.Username, dbproperties.Password, dbproperties.Host, dbproperties.Port)
+	return dsnstr, nil
+}
+
 func Connect() *DB {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+	uri, err := loadMongoProperties()
+	if err != nil {
+		log.Fatal("unable to fetch  to uri")
+	}
 
-	uri := "mongodb://root:example@localhost:27017"
-	fmt.Println(uri)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Fatal("unable to connect to mongo")
@@ -49,17 +71,17 @@ func (d *DB) CreateJob(ctx context.Context, input model.CreateJobListingInput) (
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	Insertederg, err := jobCollection.InsertOne(ctx, bson.M{
-		"jobtitle":       input.JobTitle,
-		"jobdescription": input.JobDescription,
-		"jobCompany":     input.JobCompany,
-		"jobSpocs": bson.M{
-			"manager": bson.M{
-				"managerId":   input.JobSpocs.Manager.ManagerID,
-				"managerName": input.JobSpocs.Manager.ManagerName,
+		common.JOBTITLE:       input.JobTitle,
+		common.JOBDESCRIPTION: input.JobDescription,
+		common.JOBCOMPANY:     input.JobCompany,
+		common.JOBSPOCS: bson.M{
+			common.MANAGER: bson.M{
+				common.MANAGERID:   input.JobSpocs.Manager.ManagerID,
+				common.MANAGERNAME: input.JobSpocs.Manager.ManagerName,
 			},
-			"humanResource": bson.M{
-				"hrID":   input.JobSpocs.HumanResource.HrID,
-				"hrName": input.JobSpocs.HumanResource.HrName,
+			common.HUMANRESOURCE: bson.M{
+				common.HRID:   input.JobSpocs.HumanResource.HrID,
+				common.HRNAME: input.JobSpocs.HumanResource.HrName,
 			},
 		},
 	})
@@ -163,18 +185,5 @@ func (d *DB) Jobs(ctx context.Context) ([]*model.JobListing, error) {
 		log.Println("Error", err)
 	}
 	return joblistings, nil
-
-}
-
-func (d *DB) GetManagerDetails(id string) (string, error) {
-	d.PostgresClient = &db
-
-	return "Managername", nil
-
-}
-
-func (d *DB) GetHRDetails(id string) (string, error) {
-
-	return "HRrname", nil
 
 }

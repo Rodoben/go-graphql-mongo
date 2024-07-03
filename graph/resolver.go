@@ -21,13 +21,13 @@ type Resolver struct {
 }
 
 func (r *Resolver) CreateJob(ctx context.Context, input model.CreateJobListingInput) (*model.JobListing, error) {
-	r.Db = *db
-	managerName, err := r.Db.GetManagerDetails(input.JobSpocs.Manager.ManagerID)
+
+	managerName, err := r.Db.PostgresClient.GetManagerDetails(input.JobSpocs.Manager.ManagerID)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch getmangerDetails()")
 	}
 
-	hrName, err := r.Db.GetHRDetails(input.JobSpocs.HumanResource.HrID)
+	hrName, err := r.Db.PostgresClient.GetHRDetails(input.JobSpocs.HumanResource.HrID)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch getHRDetails()")
 	}
@@ -42,7 +42,6 @@ func (r *Resolver) CreateJob(ctx context.Context, input model.CreateJobListingIn
 	return resp, nil
 }
 func (r *Resolver) UpdateJob(ctx context.Context, id string, input *model.UpdateJobListingInput) (*model.JobListing, error) {
-	r.Db = *db
 	updateJobInfo := bson.M{}
 	if input.JobTitle != "" {
 		updateJobInfo["title"] = input.JobTitle
@@ -65,7 +64,6 @@ func (r *Resolver) UpdateJob(ctx context.Context, id string, input *model.Update
 }
 
 func (r *Resolver) DeleteJob(ctx context.Context, id string) (*model.DeleteJobResponse, error) {
-	r.Db = *db
 
 	resp, err := r.Db.DeleteJob(ctx, id)
 	if err != nil {
@@ -76,7 +74,7 @@ func (r *Resolver) DeleteJob(ctx context.Context, id string) (*model.DeleteJobRe
 }
 
 func (r *Resolver) Job(ctx context.Context, id string) (*model.JobListing, error) {
-	r.Db = *db
+
 	resp, err := r.Db.Job(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch Job")
@@ -85,7 +83,7 @@ func (r *Resolver) Job(ctx context.Context, id string) (*model.JobListing, error
 }
 
 func (r *Resolver) Jobs(ctx context.Context) ([]*model.JobListing, error) {
-	r.Db = *db
+
 	resp, err := r.Db.Jobs(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch Jobs")
