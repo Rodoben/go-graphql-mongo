@@ -14,7 +14,7 @@ import (
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-var db = database.Connect()
+//var db = database.Connect()
 
 type Resolver struct {
 	Db database.DB
@@ -27,7 +27,7 @@ func (r *Resolver) CreateJob(ctx context.Context, input model.CreateJobListingIn
 		return nil, fmt.Errorf("Unable to fetch getmangerDetails()")
 	}
 
-	hrName, err := r.Db.PostgresClient.GetHRDetails(input.JobSpocs.HumanResource.HrID)
+	hrName, err := r.Db.PostgresClient.GetHRDetails(ctx, input.JobSpocs.HumanResource.HrID)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch getHRDetails()")
 	}

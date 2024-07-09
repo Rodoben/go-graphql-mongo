@@ -28,3 +28,7 @@ type DBProperties struct {
 	ReadOnlyHost string `json:"readOnlyHost"`
 	ReadOnlyPort int    `json:"readOnlyPort"`
 }
+
+const (
+	Query = "select id, status_id, status_name from sales_order.sales_order_status where status_id =$1;"
+)

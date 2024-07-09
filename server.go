@@ -5,14 +5,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/rodoben007/go-graphql-mongoDB/database"
-	"github.com/rodoben007/go-graphql-mongoDB/graph"
-	"github.com/rodoben007/go-graphql-mongoDB/repository"
+	han "github.com/rodoben007/go-graphql-mongoDB/handler"
+	"github.com/rodoben007/go-graphql-mongoDB/routes"
+
+	"github.com/gorilla/mux"
 )
 
 const defaultPort = "8080"
+
+var (
+	GetDetails = han.GetDetails
+)
 
 func main() {
 	port := os.Getenv("PORT")
@@ -20,16 +23,14 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		Db: database.DB{
-			Mongoclient:    database.Connect().Mongoclient,
-			PostgresClient: *repository.Connect(),
-		},
-	}}))
+	router := mux.NewRouter()
+	routes.RestRoutes(router)
+	routes.GraphRoutes(router)
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	log.Printf("Server starting on port %s", port)
+	err := http.ListenAndServe(":"+port, router)
+	if err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

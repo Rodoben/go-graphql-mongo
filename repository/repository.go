@@ -1,64 +1,24 @@
 package repository
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-
 	"github.com/rodoben007/go-graphql-mongoDB/common"
+	"gorm.io/gorm"
 )
 
 type Rdms struct {
-	Db *sqlx.DB
+	Db *gorm.DB
+}
+type SalesOrderStatus struct {
+	ID         int    `json:"id"`
+	StatusID   string `json:"status_id"`
+	StatusName string `json:"status_name"`
 }
 
-func Connect() *Rdms {
-	//connect to a PostgreSQL database
-	// Replace the connection details (user, dbname, password, host) with your own
-
-	dsn, err := loadDBproperties()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	db, err := sqlx.Connect("postgres", dsn)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	defer db.Close()
-
-	// Test the connection to the database
-	if err := db.Ping(); err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("Successfully Connected")
-	}
-	return &Rdms{
-		Db: db,
-	}
-}
-
-func loadDBproperties() (string, error) {
-	var dbproperties common.DBProperties
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-	dbPropertiesBytes := []byte(os.Getenv(common.APP_DB_POSTGRES_PROPERTIES))
-
-	err = json.Unmarshal(dbPropertiesBytes, &dbproperties)
-	if err != nil {
-		return "", err
-	}
-
-	dsnstr := fmt.Sprintf("user=%s dbname=%s sslmode=%s password=%s host=%s", dbproperties.Username, dbproperties.Dbname, dbproperties.Sslmode, dbproperties.Password, dbproperties.Host)
-	return dsnstr, nil
-}
+var SalesOrderRepository EmployeeDetails = &Rdms{Db: Connect().Db}
 
 func (d *Rdms) GetManagerDetails(id string) (string, error) {
 
@@ -66,8 +26,14 @@ func (d *Rdms) GetManagerDetails(id string) (string, error) {
 
 }
 
-func (d *Rdms) GetHRDetails(id string) (string, error) {
+func (d *Rdms) GetHRDetails(ctx context.Context, id string) (string, error) {
 
-	return "HRrname", nil
+	var result SalesOrderStatus
+	fmt.Println("I am here in repo", d)
+	if err := d.Db.Raw(common.Query, id).Scan(&result).Error; err != nil {
+		return "", err
+	}
+	fmt.Println("____", result)
+	return result.StatusName, nil
 
 }
